@@ -1,4 +1,5 @@
-# Meditation Sessions Timer
+# Zen Samaya [ Meditation Sessions Timer ]
+
 
 A customizable meditation timer app designed to help develop a meditation habit and maintain focus during sessions. It allows users to set start and end times, specify the number of meditation sessions, and define alarm lengths. The app schedules multiple alarms evenly between the set times.
 
