@@ -386,8 +386,9 @@ class IntervalAlarmApp:
             command=self.update_water_spin
         )
         self.arbitrary_spinbox.grid(row=spinbox_row, column=1, sticky='w', padx=0, pady=(10, 0))
-
-
+        
+        self.arbitrary_spinbox_label.grid_remove()
+        self.arbitrary_spinbox.grid_remove()
 
         # Replace the simple Label with a frame to hold checkboxes
         self.alarms_checkboxes_frame = tk.Frame(self.alarms_frame)
