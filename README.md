@@ -52,5 +52,3 @@ Contributions and suggestions are welcome. Please open issues or pull requests f
 This project is licensed under the MIT License.
 
 ---
-
-Feel free to customize the README further as needed for your GitHub repository.
