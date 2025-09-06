@@ -14,6 +14,10 @@ from PIL import Image, ImageTk  # Add this import at the top
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 SETTINGS_FILE = os.path.join(script_dir,".srvn_apps", 'settings.json') 
+if not os.path.exists(SETTINGS_FILE):
+    with open(SETTINGS_FILE, "w") as f:
+        pass  # Just create the empty file
+
 pygame_lock = threading.Lock()
 global_start_time = 0.0
 
@@ -175,6 +179,7 @@ class IntervalAlarmApp:
             self.setup_frame.grid_columnconfigure(i, weight=1)
         
         self.initialise_settings_vars()
+        self.alarm_duration_seconds = 0
         row = 0
 
         # Start time
@@ -207,7 +212,7 @@ class IntervalAlarmApp:
         row += 1
 
         # Folder
-        self.folder_label = ScrollingLabel(self.setup_frame, text=self.sound_folder or "No folder", width=20, font=monospace_font)
+        self.folder_label = ScrollingLabel(self.setup_frame, text=self.sound_folder or "-", width=20, font=monospace_font)
         
 
         tk.Label(self.setup_frame, text="🎵", font=montserrat_font).grid(row=row, column=0, sticky='w')
@@ -522,7 +527,7 @@ class IntervalAlarmApp:
         folder = filedialog.askdirectory(title="Select sound folder")
         if folder:
             self.sound_folder = folder
-            self.folder_label.config(text=folder)
+            self.folder_label.set_text(folder)
             self.save_settings()
 
     def edit_length(self,event=None):
