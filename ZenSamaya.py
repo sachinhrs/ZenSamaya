@@ -9,14 +9,23 @@ import json
 import pygame
 import subprocess
 from PIL import Image, ImageTk  # Add this import at the top
+from appdirs import user_data_dir
 
 
+#script_dir = os.path.dirname(os.path.abspath(__file__))
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-SETTINGS_FILE = os.path.join(script_dir,".srvn_apps", 'settings.json') 
+appname = "ZenSamaya"
+author = "SachinHrs"
+data_dir = user_data_dir(appname, author)
+os.makedirs(data_dir, exist_ok=True)
+
+# Save a configuration file
+SETTINGS_FILE = os.path.join(data_dir, "settings.json")       
+
 if not os.path.exists(SETTINGS_FILE):
     with open(SETTINGS_FILE, "w") as f:
         pass  # Just create the empty file
+
 
 pygame_lock = threading.Lock()
 global_start_time = 0.0
@@ -341,8 +350,8 @@ class IntervalAlarmApp:
         )
         self.arbitrary_spinbox.grid(row=spinbox_row, column=1, sticky='w', padx=0, pady=(10, 0))
         
-        self.arbitrary_spinbox_label.grid_remove()
-        self.arbitrary_spinbox.grid_remove()
+        #self.arbitrary_spinbox_label.grid_remove()
+        #self.arbitrary_spinbox.grid_remove()
 
         # Replace the simple Label with a frame to hold checkboxes
         self.alarms_checkboxes_frame = tk.Frame(self.alarms_frame)
@@ -893,12 +902,6 @@ class IntervalAlarmApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    try:
-        ico_file = os.path.join(script_dir, 'icon.png')
-        icon = tk.PhotoImage(file=ico_file)
-        root.iconphoto(True, icon)
-    except Exception as e:
-        print(f"Could not set icon: {e}")
 
     try:
         root.tk.call("font", "create", "Montserrat", "-family", "Montserrat")
