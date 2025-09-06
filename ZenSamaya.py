@@ -17,10 +17,6 @@ SETTINGS_FILE = os.path.join(script_dir,".srvn_apps", 'settings.json')
 pygame_lock = threading.Lock()
 global_start_time = 0.0
 
-def truncate_text(text, max_length=30):
-    if len(text) > max_length:
-        return text[:max_length-3] + "..."
-    return text
 
 def play_mp3_for_duration(stop_event, file_path, duration, update_countdown_func, mute_state):
     global global_start_time
@@ -118,21 +114,6 @@ class RoundedButton(tk.Canvas):
     def set_text(self,text=""):
         self.itemconfig(self.text_id, text=text)
 
-class FlashingLabel(tk.Label):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
-        self._visible = True
-        self._flash()
-
-    def _flash(self):
-        if self._visible:
-            self.config(fg="systemTextColor")   # Visible color
-            delay = 800             # Stay visible for 800ms
-        else:
-            self.config(fg="systemWindowBackgroundColor")  # Hide text by matching background
-            delay = 200             # Invisible for 200ms
-        self._visible = not self._visible
-        self.after(delay, self._flash)
 
 class ScrollingLabel(tk.Label):
     def __init__(self, master, text, width=20, delay=250, **kwargs):
@@ -185,19 +166,9 @@ class IntervalAlarmApp:
 
         self.frame_id = "load"
         # Alarm setup frame (NEW STYLE)
-        self.setup_frame = tk.Frame(master,padx = 20,pady=10)#, padx=10, pady=15)
-        self.setup_frame.grid(row=0, column=0, sticky='nsew')# ,  ipadx=50, ipady=10)
+        self.setup_frame = tk.Frame(master,padx = 20,pady=10)
+        self.setup_frame.grid(row=0, column=0, sticky='nsew')
 
-        # Load and place background image
-        """ try:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            image_file = os.path.join(script_dir, 'bg.png')
-            image = Image.open(image_file)  # Replace with your image path
-            self.bg_image = ImageTk.PhotoImage(image)
-            bg_label = tk.Label(self.setup_frame, image=self.bg_image)
-            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        except Exception as e:
-            print(f"Failed to load background image: {e}")"""
 
 
         for i in range(3):
@@ -205,9 +176,7 @@ class IntervalAlarmApp:
         
         self.initialise_settings_vars()
         row = 0
-        #spacer = tk.Label(self.setup_frame, text="")
-        #spacer.grid(row=row, column=0)
-        #row += 1
+
         # Start time
         self.start_time_label = tk.Label(self.setup_frame, text=self._format_time(self.start_hour, self.start_minute, self.start_second, self.start_ampm), font=montserrat_font)
         tk.Label(self.setup_frame, text="🕒", font=montserrat_font).grid(row=row, column=0, sticky='w')
@@ -225,7 +194,6 @@ class IntervalAlarmApp:
 
         self.end_edit_btn = tk.Label(self.setup_frame, text="🖊️")
         self.end_edit_btn.bind("<Button-1>", self.edit_end_time)   
-    #    self.end_edit_btn = tk.Button(self.setup_frame, text="🖊️", command=self.edit_end_time, font=montserrat_font_bold)
         self.end_edit_btn.grid(row=row, column=2,sticky="e")
         row += 1
 
@@ -235,18 +203,15 @@ class IntervalAlarmApp:
         self.count_label.grid(row=row, column=1, sticky='w')
         self.count_edit_btn = tk.Label(self.setup_frame, text="🖊️")
         self.count_edit_btn.bind("<Button-1>", self.edit_count)   
-        #self.count_edit_btn = tk.Button(self.setup_frame, text="🖊️", command=self.edit_count, font=montserrat_font_bold)
         self.count_edit_btn.grid(row=row, column=2,sticky="e")
         row += 1
 
         # Folder
         self.folder_label = ScrollingLabel(self.setup_frame, text=self.sound_folder or "No folder", width=20, font=monospace_font)
         
-        #tk.Label(self.setup_frame, text=self.sound_folder or "No folder", font=montserrat_font)
 
         tk.Label(self.setup_frame, text="🎵", font=montserrat_font).grid(row=row, column=0, sticky='w')
         self.folder_label.grid(row=row, column=1, sticky='w')
-        #self.folder_edit_btn = tk.Button(self.setup_frame, text="🖊️", command=self.edit_folder, font=montserrat_font_bold)
         self.folder_edit_btn = tk.Label(self.setup_frame, text="📁")
         self.folder_edit_btn.bind("<Button-1>", self.edit_folder)   
         self.folder_edit_btn.grid(row=row, column=2,sticky="e")
@@ -258,7 +223,6 @@ class IntervalAlarmApp:
         self.length_label.grid(row=row, column=1, sticky='w')
         self.length_edit_btn = tk.Label(self.setup_frame, text="🖊️")
         self.length_edit_btn.bind("<Button-1>", self.edit_length)   
-        #self.length_edit_btn = tk.Button(self.setup_frame, text="🖊️", command=self.edit_length, font=montserrat_font_bold)
         self.length_edit_btn.grid(row=row, column=2,sticky="e")
         row += 1
 
@@ -266,9 +230,7 @@ class IntervalAlarmApp:
         spacer.grid(row=row, column=0)
         row += 1
 
-        #self.set_button = RoundedButton(master= self.setup_frame ,text="This is a \n rounded button", radius=100, btnbackground="#0078ff", btnforeground="#ffffff", clicked=self.set_alarms)
 
-        #self.set_button = tk.Button(self.setup_frame, text="⏰ Set", command=self.set_alarms, font=montserrat_font_bold, width =20)
         self.set_button = RoundedButton(self.setup_frame, 200, 30, 10, 2, 'lightgray', 'systemWindowBackgroundColor',text ="⏰ Set", command=self.set_alarms)
         self.set_button.grid(row=row, column=0, columnspan=8)#, pady=(10, 10))
 
@@ -277,7 +239,6 @@ class IntervalAlarmApp:
         for i in range(row):
             self.setup_frame.grid_rowconfigure(i, minsize=30)
 
-        #self.set_button.grid_configure(sticky="ew")
 
         # Alarm running frame
         self.running_frame = tk.Frame(master, padx=20, pady=15)
@@ -291,8 +252,6 @@ class IntervalAlarmApp:
         round_btn_height = 30
 
         self.next_file_label = ScrollingLabel(self.running_frame, text="", width=40, font=monospace_font)
-        #tk.Label(self.running_frame, text="", font=montserrat_font)
-       # ScrollingLabel(self.running_frame, text=self.sound_folder or "No folder", width=10, font=montserrat_font)
        
         self.next_file_label.grid(row=row, column=0, columnspan=5,rowspan=2, sticky='ew', pady=(0,6))
         self.next_file_label.bind("<Button-1>", lambda e: self.toggle_test_play_pause())
@@ -301,16 +260,13 @@ class IntervalAlarmApp:
         button_row=row
         self.trigger_now_btn =  RoundedButton(self.running_frame, round_btn_width, round_btn_height, 10, 2, 'lightgray', 'systemWindowBackgroundColor',text ="▶️ Start now", command=self.trigger_alarm_now)
         
-        #tk.Button(self.running_frame, text="▶️ Start now  ", command=self.trigger_alarm_now, state='normal', font=montserrat_font_bold)
         self.trigger_now_btn.grid(row=row, column=0, columnspan=1, sticky='w', padx=0, pady=(0, 0))
 
         #row += 1
         self.mute_btn = RoundedButton(self.running_frame, round_btn_width, round_btn_height, 10, 2, 'lightgray', 'systemWindowBackgroundColor',text ="🔇 Mute", command=self.toggle_mute)
 
-        #tk.Button(self.running_frame, text="🔇 Mute", command=self.toggle_mute, font=montserrat_font_bold)
         self.mute_btn.grid(row=row, column=1, columnspan=1, padx=0, pady=0)
 
-        #self.randomize_button = tk.Button(self.running_frame, text="🔀", command=self.randomize_next_sound, state='disabled', font=montserrat_font_bold)
         self.randomize_button =  RoundedButton(self.running_frame, round_btn_width, round_btn_height, 10, 2, 'lightgray', 'systemWindowBackgroundColor',text ="🔀", command=self.randomize_next_sound)
 
         self.randomize_button.grid(row=row, column=4, sticky='e')#, padx=5, pady=(0,6))
@@ -319,9 +275,6 @@ class IntervalAlarmApp:
 
         # Add Play/Pause button next to Randomize button
         self.is_test_playing = False  # state for test audio playback
-        #self.play_pause_btn = tk.Button(self.running_frame, text="▶️ Play", command=self.toggle_test_play_pause, state='active', font=montserrat_font_bold)
-        #self.play_pause_btn.grid(row=row, column=6, sticky='w', padx=5, pady=(0,6))
-
 
 
 
@@ -332,7 +285,6 @@ class IntervalAlarmApp:
 
         #row += 1
         self.countdown_label = tk.Label(self.running_frame, text="A", font=montserrat_font)#("Montserrat", 16))
-        #FlashingLabel(self.running_frame, text="", font=montserrat_font)
         self.countdown_label.grid(row=row, column=3, columnspan=2, sticky='e', pady=(10, 10))
 
         row += 1
@@ -341,7 +293,6 @@ class IntervalAlarmApp:
         self.next_alarm_label = tk.Label(self.running_frame, text="None ➡️", font=montserrat_font_bold)
         self.next_alarm_label.grid(row=row, column=4, sticky='e', pady=(0,6))
 
-        # Add "Trigger Alarm Now" button
 
         # Collapsible scheduled alarms area
 
@@ -349,12 +300,10 @@ class IntervalAlarmApp:
 
         self.stop_all_btn =  RoundedButton(self.running_frame, round_btn_width, round_btn_height, 10, 2, 'lightgray', 'systemWindowBackgroundColor',text ="⏹️ Stop All", command=self.stop_all_alarms)
 
-        #self.stop_all_btn = tk.Button(self.running_frame, text="⏹️ Stop All", command=self.stop_all_alarms, font=montserrat_font_bold)
         self.stop_all_btn.grid(row=row, column=3, columnspan=2, sticky='ew', padx=0, pady=0)
         
         self.toggle_alarms_btn = RoundedButton(self.running_frame, round_btn_width*2, round_btn_height, 10, 2, 'lightgray', 'systemWindowBackgroundColor',text ="▼ Scheduled Sessions 🕗", command=self.toggle_alarms_list)
 
-        #tk.Button(self.running_frame, text="▼ Scheduled Sessions 🕗", font=montserrat_font_bold,command=self.toggle_alarms_list)
         self.toggle_alarms_btn.grid(row=row, column=0, columnspan=2, sticky='ew', pady=(10, 10))
         
         for i in range(row):
@@ -413,13 +362,8 @@ class IntervalAlarmApp:
         self.load_settings()
         self.update_water_spin(save=False)
 
-        #print(self.frame_id)
         if(self.frame_id == "running"):
             self.master.after(100, self.set_alarms)
-            #self.set_alarms()
-            #print("load running page")
-        
-         #   self.frame_id = 1
 
     def initialise_settings_vars(self):
         """Load initial values from file (or supply defaults)."""
@@ -664,10 +608,6 @@ class IntervalAlarmApp:
             return
 
         # Set check statuses to unchecked initially or from saved, truncating or padding as necessary
-        #if hasattr(self, 'saved_alarm_check_statuses') and len(self.saved_alarm_check_statuses) == num_alarms:
-        # #   self.alarm_check_statuses = self.saved_alarm_check_statuses
-        #else:
-        #    self.alarm_check_statuses = [False]*num_alarms
 
         
         self.frame_id = "running"
@@ -706,26 +646,18 @@ class IntervalAlarmApp:
         self.alarmsBox_initate = False
 
     def toggle_alarms_list(self):
-        #print(self.saved_alarm_check_statuses)
+
         if self.alarms_frame_visible:
             self.alarms_frame.grid_remove()
             self.toggle_alarms_btn.set_text(text="▼ Scheduled Sessions 🕗")
             self.alarms_frame_visible = False
         else:
-            #if self.alarmsBox_initate:
-            #self.load_settings()
-            #self.alarmsBox_initate = True
-            #print(self.saved_alarm_check_statuses)
-            #self.update_alarms_list()
+
             self.alarms_frame.grid()
             self.toggle_alarms_btn.set_text(text="▲ Scheduled Sessions 🕗")
             self.alarms_frame_visible = True
-       # print(self.saved_alarm_check_statuses)
 
     def update_alarms_list(self):
-        # Clear existing widgets in the checkboxes frame
-        #if len(self.alarms_checkboxes_frame.winfo_children())>0:
-         #   return
     # Clear existing widgets in the checkboxes frame
         for widget in self.alarms_checkboxes_frame.winfo_children():
             widget.destroy()
@@ -756,34 +688,6 @@ class IntervalAlarmApp:
             self.alarm_check_vars.append(var)
         self.save_settings()
         return
-        for widget in self.alarms_checkboxes_frame.winfo_children():
-            widget.destroy()
-        self.alarm_check_vars = []
-
-        if not self.alarm_times:
-            label = tk.Label(self.alarms_checkboxes_frame, text="No scheduled alarms.")
-            label.pack()
-            return
-
-        num_alarms = len(self.alarm_times)
-        # Restore saved checkbox states or initialize all False if not matching
-        if hasattr(self, 'saved_alarm_check_statuses') and len(self.saved_alarm_check_statuses) == num_alarms:
-            self.alarm_check_statuses = self.saved_alarm_check_statuses
-        else:
-            self.alarm_check_statuses = [False]*num_alarms
-
-        # Create checkboxes with restored/initialized states
-        for i, t in enumerate(self.alarm_times):
-            var = tk.BooleanVar(value=self.alarm_check_statuses[i])
-            cb = tk.Checkbutton(
-                self.alarms_checkboxes_frame,
-                text=f"{i+1:2d}. {t.strftime('%I:%M:%S %p')}",
-                variable=var,
-                command=self.save_settings
-            )
-            cb.pack(anchor='w')
-            self.alarm_check_vars.append(var)
-        self.save_settings()
 
 
     def alarm_thread(self):
@@ -889,12 +793,9 @@ class IntervalAlarmApp:
     def update_next_sound_label(self):
         if self.next_sound_file:
             filename = os.path.basename(self.next_sound_file)
-            #truncated = truncate_text(filename)
             self.next_file_label.set_text(filename)
-            #self.next_file_label.config(text=truncated)
         else:
             self.next_file_label.set_text("")
-            #self.next_file_label.config(text="")
 
     def randomize_next_sound(self):
         playtest = True if self.is_test_playing else False
@@ -924,7 +825,6 @@ class IntervalAlarmApp:
         self.mute_btn.set_text(text="🔇 Mute")
         self.countdown_label.config(text=self.format_seconds(self.alarm_duration_seconds))
         self.next_file_label.set_text("")
-        #self.next_file_label.config(text="")
         self.alarm_times.clear()
         self.prev_alarm_label.config(text="⬅️ None")
         self.next_alarm_label.config(text="➡️ None")
@@ -976,7 +876,6 @@ class IntervalAlarmApp:
                         pygame.mixer.music.load(test_file)
                         pygame.mixer.music.play(loops=-1)
                     self.is_test_playing = True
-                    #self.play_pause_btn.config(text="⏸️ Pause")
                 except Exception as e:
                     messagebox.showerror("Playback Error", f"Error playing sound: {e}")
             else:
@@ -984,7 +883,6 @@ class IntervalAlarmApp:
                 try:
                     pygame.mixer.music.pause()
                     self.is_test_playing = False
-                    #self.play_pause_btn.config(text="▶️ Play")
                 except Exception as e:
                     messagebox.showerror("Playback Error", f"Error pausing sound: {e}")
 
