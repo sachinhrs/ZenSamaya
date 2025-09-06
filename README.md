@@ -15,9 +15,19 @@ A customizable meditation timer app designed to help develop a meditation habit 
 
 Clone the repository and ensure Python and required dependencies are installed:
 
-git clone  cd meditation-sessions-timer
-pip install -r requirements.txt 
-python ZenSamaya.py
+```
+# Clone the repository
+git clone https://github.com/sachinhrs/ZenSamaya.git
+
+# Navigate into the project directory
+cd ZenSamaya
+
+# Install required Python packages
+pip install -r requirements.txt
+
+# Run Script
+python3 ZenSamaya.py
+```
 
 ## Usage
 
