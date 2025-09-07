@@ -20,7 +20,23 @@ data_dir = user_data_dir(appname, author)
 os.makedirs(data_dir, exist_ok=True)
 
 # Save a configuration file
-SETTINGS_FILE = os.path.join(data_dir, "settings.json")       
+SETTINGS_FILE = os.path.join(data_dir, "settings.json")   
+log_path = os.path.join(data_dir, "events.log")    # Specify your file path
+
+def get_now():
+    return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+with open(log_path, 'w') as log_file:
+    log_file.write(f'app started at {get_now()}\n')
+
+# Step 2: Function to append a string (with added newline) to the log file
+def log_print(message):
+    print(message)
+    with open(log_path, 'a') as log_file:
+        log_file.write(f"{message}\n")
+
+def log_print_now():
+    log_print(get_now())
 
 if not os.path.exists(SETTINGS_FILE):
     with open(SETTINGS_FILE, "w") as f:
@@ -38,10 +54,10 @@ def play_mp3_for_duration(stop_event, file_path, duration, update_countdown_func
             pygame.mixer.music.load(file_path)
             pygame.mixer.music.play(loops=-1)
             pygame.mixer.music.set_volume(0.0 if mute_state['muted'] else 1.0)
-            print("Alarm Triggered at ")
-            print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+            log_print("Alarm Triggered at ")
+            log_print_now()
         except Exception as e:
-            print(f"Error playing {file_path}: {e}")
+            log_print(f"Error playing {file_path}: {e}")
             return
 
     global_start_time = time.time()
@@ -56,23 +72,23 @@ def play_mp3_for_duration(stop_event, file_path, duration, update_countdown_func
                 vol = 0.0 if mute_state['muted'] else 1.0
                 pygame.mixer.music.set_volume(vol)
             except Exception as e:
-                print(f"Error setting volume: {e}")
+                log_print(f"Error setting volume: {e}")
         time.sleep(0.1)
 
     with pygame_lock:
         try:
             pygame.mixer.music.fadeout(2000)
         except Exception as e:
-            print(f"Error during fadeout: {e}")
+            log_print(f"Error during fadeout: {e}")
     update_countdown_func(0)
     time.sleep(2)
     with pygame_lock:
         try:
-            print("Alarm Ended at ")
-            print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+            log_print("Alarm Ended at ")
+            log_print_now()
             pygame.mixer.music.stop()
         except Exception as e:
-            print(f"Error stopping music: {e}")
+            log_print(f"Error stopping music: {e}")
 
 
 montserrat_font = ("Montserrat", 12)
@@ -88,11 +104,11 @@ class RoundedButton(tk.Canvas):
 
 
         if cornerradius > 0.5*width:
-            print("Error: cornerradius is greater than width.")
+            log_print("Error: cornerradius is greater than width.")
             return None
 
         if cornerradius > 0.5*height:
-            print("Error: cornerradius is greater than height.")
+            log_print("Error: cornerradius is greater than height.")
             return None
 
         rad = 2*cornerradius
@@ -461,7 +477,7 @@ class IntervalAlarmApp:
             with open(SETTINGS_FILE, "w") as f:
                 json.dump(settings, f)
         except Exception as e:
-            print(f"Error saving settings: {e}")
+            log_print(f"Error saving settings: {e}")
 
     def load_settings(self):
         try:
@@ -470,7 +486,7 @@ class IntervalAlarmApp:
             self.saved_alarm_check_statuses = settings.get("alarm_check_statuses", [])
             self.arbitrary_integer_var.set(settings.get("arbitrary_integer", 0))
         except Exception as e:
-            print(f"Error loading settings: {e}")
+            log_print(f"Error loading settings: {e}")
             self.arbitrary_integer_var.set(0)
             self.saved_alarm_check_statuses = []
 
@@ -556,7 +572,7 @@ class IntervalAlarmApp:
             try:
                 self.caffeinate_process = subprocess.Popen(['caffeinate','-i'])
             except Exception as e:
-                print(f"Could not start caffeinate: {e}")
+                log_print(f"Could not start caffeinate: {e}")
 
     def stop_caffeinate(self):
         if self.caffeinate_process:
